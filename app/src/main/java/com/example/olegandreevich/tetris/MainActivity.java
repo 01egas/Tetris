@@ -10,7 +10,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -28,13 +27,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     int[][] shapeForHandle = new int[4][2];
 
+    int[][] shape0;
     int[][] shape1;
     int[][] shape2;
     int[][] shape3;
     int[][] shape4;
     int[][] shape5;
     int[][] shape6;
-    int[][] shape7;
 
 
     static int[][] currentShape;
@@ -66,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     Button[][] gameBoard;
 
+    int[] fillingLines;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,17 +88,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         currentShape = new int[4][2];
 
+        fillingLines = new int[20];
+
         mainWindowGame = findViewById(R.id.mainLayout);
         mainWindowGame.setOnTouchListener(this);
 
-        shape1 = new int[][]{{0, 3}, {1, 3}, {1, 4}, {1, 5}}; // |_
-        shape2 = new int[][]{{0, 5}, {1, 3}, {1, 4}, {1, 5}}; // _|
-        shape3 = new int[][]{{0, 4}, {1, 3}, {1, 4}, {1, 5}}; // .!.
-        shape4 = new int[][]{{0, 4}, {0, 5}, {1, 3}, {1, 4}}; // _-
-        shape5 = new int[][]{{0, 3}, {0, 4}, {1, 4}, {1, 5}}; // -_
-        shape6 = new int[][]{{0, 4}, {0, 5}, {1, 4}, {1, 5}}; // #
-        shape7 = new int[][]{{0, 4}, {1, 4}, {2, 4}, {3, 4}}; // |
-        shapesArray = new int[][][]{shape1, shape2, shape3, shape4, shape5, shape6, shape7};
+        shape0 = new int[][]{{0, 3}, {1, 3}, {1, 4}, {1, 5}}; // |__
+        shape1 = new int[][]{{0, 5}, {1, 3}, {1, 4}, {1, 5}}; // __|
+        shape2 = new int[][]{{0, 4}, {1, 3}, {1, 4}, {1, 5}}; // .!.
+        shape3 = new int[][]{{0, 4}, {0, 5}, {1, 3}, {1, 4}}; // _-
+        shape4 = new int[][]{{0, 3}, {0, 4}, {1, 4}, {1, 5}}; // -_
+        shape5 = new int[][]{{0, 4}, {0, 5}, {1, 4}, {1, 5}}; // #
+        shape6 = new int[][]{{0, 4}, {1, 4}, {2, 4}, {3, 4}}; // |
+        shapesArray = new int[][][]{shape0, shape1, shape2, shape3, shape4, shape5, shape6};
 
 
         gameBoard = new Button[][]{
@@ -160,6 +163,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < shape.length; i++) {
             currentShape[i][0] = shape[i][0];
             currentShape[i][1] = shape[i][1];
+            shapeForHandle[i][0] = shape[i][0];
+            shapeForHandle[i][1] = shape[i][1];
+
             gameBoard[shape[i][0]][shape[i][1]].setVisibility(View.VISIBLE);
 
         }
@@ -206,7 +212,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                Toast.makeText(getApplicationContext(), " it work", Toast.LENGTH_SHORT).show();
                 boolean itDraw = true;
 
-//            int[] coordinatesOfCurrentButton;
 
 //Arrays.asList(currentShape).contains(coordinatesForCompare)
                 for (int[] coordinatesOfCurrentButton : currentShape) {
@@ -217,6 +222,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         continue;
                     } else {
                         itDraw = false;
+                        incrementFillLines();
+                        checkFillLines();
                         createShape();
                         break;
                     }
@@ -233,6 +240,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
+
+    }
+
+    public void checkFillLines() {
+        int countOfCleanLines = 0;
+        for (int i = fillingLines.length - 1; i >= 0; i--) {
+            if (fillingLines[i] == 10) {
+
+                countOfCleanLines++;
+
+
+            } else if (countOfCleanLines > 0){
+                for (int j = 0; j < 10; j++) {
+                    gameBoard[i + countOfCleanLines][j].setVisibility(gameBoard[i][j].getVisibility());
+                    gameBoard[i][j].setVisibility(View.INVISIBLE);
+                }
+                fillingLines[i + countOfCleanLines] = fillingLines[i];
+                fillingLines[i] = 0;
+
+            }
+        }
+    }
+
+    public void incrementFillLines() {
+        for (int i = 0; i < currentShape.length; i++) {
+            fillingLines[currentShape[i][0]]++;
+        }
 
     }
 
@@ -583,10 +617,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.makeText(getApplicationContext(), "_-", Toast.LENGTH_SHORT).show();
                             break;
                         case 4:
-                            if (currentShape[2][0] == currentShape[3][0] && currentShape[2][1] - 1 == currentShape[3][1]) {
+                            if (currentShape[2][0] - 1 == currentShape[0][0] && currentShape[2][1] - 1 == currentShape[0][1]) {
 
-                                shapeForHandle[0][0] = currentShape[0][1] + 2;
-                                shapeForHandle[0][1] = currentShape[0][0];
+                                shapeForHandle[0][0] = currentShape[0][0] + 2;
+                                shapeForHandle[0][1] = currentShape[0][1];
                                 shapeForHandle[1][0] = currentShape[1][0] + 1;
                                 shapeForHandle[1][1] = currentShape[1][1] - 1;
                                 shapeForHandle[2][0] = currentShape[2][0];
@@ -594,7 +628,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 shapeForHandle[3][0] = currentShape[3][0] - 1;
                                 shapeForHandle[3][1] = currentShape[3][1] - 1;
 
-                            } else if (currentShape[2][0] - 1 == currentShape[0][0] && currentShape[2][1] == currentShape[0][1]) {
+                            } else if (currentShape[2][0] + 1 == currentShape[0][0] && currentShape[2][1] - 1 == currentShape[0][1]) {
 
                                 shapeForHandle[0][0] = currentShape[0][0] - 2;
                                 shapeForHandle[0][1] = currentShape[0][1];
