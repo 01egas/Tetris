@@ -1771,14 +1771,195 @@ android:background="@android:color/holo_blue_bright"
         android:id="@+id/additionalContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/btPlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+
             android:backgroundTint="@android:color/holo_orange_dark"
             android:text="Play" />
+
+        <Button
+            android:id="@+id/btReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Reset" />
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:orientation="vertical"
+            android:layout_margin="2dp"
+            android:background="@android:color/holo_purple">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btNextShape00"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape01"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape02"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape03"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btNextShape10"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape11"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape12"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape13"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btNextShape20"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape21"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape22"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape23"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btNextShape30"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape31"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape32"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+
+                <Button
+                    android:id="@+id/btNextShape33"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible"
+                    android:background="@android:color/holo_green_dark" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvTotalScore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="score:" />
+
+        <TextView
+            android:id="@+id/tvLevel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="level:" />
+
     </LinearLayout>
 </LinearLayout>

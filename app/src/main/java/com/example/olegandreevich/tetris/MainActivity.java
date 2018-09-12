@@ -1,5 +1,6 @@
 package com.example.olegandreevich.tetris;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Arrays;
@@ -23,7 +25,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static int current0;
     static int current1;
     static int currentShapeInt;
+    static int nextShapeInt;
+    static int score;
+    static int speedOfShape;
+    static int countOfShapes;
+    static int level;
 
+    static Button[][] nextShape;
+
+    public static boolean resetGame = false;
 
     int[][] shapeForHandle = new int[4][2];
 
@@ -37,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     static int[][] currentShape;
-    Button btLeft, btRight, btRotate, btPlay,
+    Button btLeft, btRight, btRotate, btPlay, btReset,
             bt00, bt01, bt02, bt03, bt04, bt05, bt06, bt07, bt08, bt09,
             bt10, bt11, bt12, bt13, bt14, bt15, bt16, bt17, bt18, bt19,
             bt20, bt21, bt22, bt23, bt24, bt25, bt26, bt27, bt28, bt29,
@@ -57,8 +67,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bt160, bt161, bt162, bt163, bt164, bt165, bt166, bt167, bt168, bt169,
             bt170, bt171, bt172, bt173, bt174, bt175, bt176, bt177, bt178, bt179,
             bt180, bt181, bt182, bt183, bt184, bt185, bt186, bt187, bt188, bt189,
-            bt190, bt191, bt192, bt193, bt194, bt195, bt196, bt197, bt198, bt199;
+            bt190, bt191, bt192, bt193, bt194, bt195, bt196, bt197, bt198, bt199,
+            btNextShape00, btNextShape01, btNextShape02, btNextShape03,
+            btNextShape10, btNextShape11, btNextShape12, btNextShape13,
+            btNextShape20, btNextShape21, btNextShape22, btNextShape23,
+            btNextShape30, btNextShape31, btNextShape32, btNextShape33;
     LinearLayout mainWindowGame;
+    TextView totalScore, tvLevel;
 
 
     int[][][] shapesArray;// = {shape1, shape2, shape3, shape4, shape5, shape6, shape7};
@@ -86,12 +101,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btPlay = findViewById(R.id.btPlay);
         btPlay.setOnClickListener(this);
 
+        btReset = findViewById(R.id.btReset);
+        btReset.setOnClickListener(this);
+
+        speedOfShape = 500;
+        countOfShapes = 0;
+        level = 1;
+
+        totalScore = findViewById(R.id.tvTotalScore);
+        totalScore.setText("Score: " + score);
+
+        tvLevel = findViewById(R.id.tvLevel);
+        tvLevel.setText("Level: " + level);
+
+        score = 0;
         currentShape = new int[4][2];
 
         fillingLines = new int[20];
 
         mainWindowGame = findViewById(R.id.mainLayout);
-        mainWindowGame.setOnTouchListener(this);
+
 
         shape0 = new int[][]{{0, 3}, {1, 3}, {1, 4}, {1, 5}}; // |__
         shape1 = new int[][]{{0, 5}, {1, 3}, {1, 4}, {1, 5}}; // __|
@@ -102,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         shape6 = new int[][]{{0, 4}, {1, 4}, {2, 4}, {3, 4}}; // |
         shapesArray = new int[][][]{shape0, shape1, shape2, shape3, shape4, shape5, shape6};
 
+        nextShapeInt = ThreadLocalRandom.current().nextInt(0, 7);
 
         gameBoard = new Button[][]{
                 {bt00, bt01, bt02, bt03, bt04, bt05, bt06, bt07, bt08, bt09},
@@ -126,6 +156,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {bt190, bt191, bt192, bt193, bt194, bt195, bt196, bt197, bt198, bt199}
         };
 
+        nextShape = new Button[][]{
+                {btNextShape00, btNextShape01, btNextShape02, btNextShape03},
+                {btNextShape10, btNextShape11, btNextShape12, btNextShape13},
+                {btNextShape20, btNextShape21, btNextShape22, btNextShape23},
+                {btNextShape30, btNextShape31, btNextShape32, btNextShape33}
+        };
+
 
     }
 
@@ -145,6 +182,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 createShape();
                 runThread();
                 break;
+            case R.id.btReset:
+                resetGame();
+                break;
         }
     }
 
@@ -158,6 +198,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void createShape() {
 
         int[][] shape = choiceNewShape();
+        countOfShapes++;
+        nextShapeInt = ThreadLocalRandom.current().nextInt(0, 7);
+        showNextShape();
 //        currentShapeInt = 1;
 //        int[][] shape = shapesArray[1];
         for (int i = 0; i < shape.length; i++) {
@@ -171,6 +214,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
+    }
+
+    public void resetGame() {
+        game.cancel(false);
+        for (int i = 0; i < gameBoard.length; i++) {
+            for (int j = 0; j < gameBoard[i].length; j++) {
+                gameBoard[i][j].setVisibility(View.INVISIBLE);
+            }
+        }
+        speedOfShape = 500;
+        countOfShapes = 0;
+        level = 1;
+        cleanNextShape();
+        nextShapeInt = ThreadLocalRandom.current().nextInt(0, 7);
+
+        currentShape = new int[4][2];
+        shapeForHandle = new int[4][2];
+
+
+    }
+
+    public void showNextShape() {
+        cleanNextShape();
+        int[][] sh = shapesArray[nextShapeInt];
+        for (int i = 0; i < 4; i++) {
+            nextShape[sh[i][0]][sh[i][1] - 3].setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void cleanNextShape() {
+        for (int j = 0; j < nextShape.length; j++) {
+            for (int g = 0; g < nextShape[j].length; g++) {
+                nextShape[j][g].setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     public class Game extends AsyncTask {
@@ -187,14 +265,57 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected synchronized Object doInBackground(Object[] objects) {
 
-            while (true) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(500);
-                    publishProgress();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+
+
+//                if (resetGame) {
+//                    for (int i = gameBoard.length - 1; i >= 0; i--) {
+//                        current0 = i;
+//                        visInvis = 0;
+//                        publishProgress();
+//
+//                        try {
+//                            TimeUnit.MILLISECONDS.sleep(50);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//
+//                    }
+//                    for (int i = 0; i < gameBoard.length; i++) {
+//
+//                        current0 = i;
+//                        visInvis = 4;
+//                        publishProgress();
+//                        try {
+//                            TimeUnit.MILLISECONDS.sleep(50);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//
+//
+//                    }
+//
+//
+//                }
+
+                    while (!isCancelled()) {
+                        if (countOfShapes == 50) {
+                            speedOfShape -= 50;
+                            countOfShapes = 0;
+                            level++;
+                            tvLevel.setText("Level: " + level);
+                        }
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(speedOfShape);
+                            publishProgress();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+
+
+                return null;
 
         }
 
@@ -204,38 +325,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+
+
+        @Override
         protected void onProgressUpdate(Object[] values) {
             synchronized (currentShape) {
 
 
                 super.onProgressUpdate(values);
-//                Toast.makeText(getApplicationContext(), " it work", Toast.LENGTH_SHORT).show();
-                boolean itDraw = true;
 
 
-//Arrays.asList(currentShape).contains(coordinatesForCompare)
-                for (int[] coordinatesOfCurrentButton : currentShape) {
-                    current0 = coordinatesOfCurrentButton[0];
-                    current1 = coordinatesOfCurrentButton[1];
-                    if (coordinatesOfCurrentButton[0] != 19
-                            && (gameBoard[current0 + 1][current1].getVisibility() == View.INVISIBLE ? true : checkCoordinates(current0 + 1, current1, currentShape))) { //checkCoordinates(coordinatesOfCurrentButton, currentShape)
-                        continue;
-                    } else {
-                        itDraw = false;
-                        incrementFillLines();
-                        checkFillLines();
-                        createShape();
-                        break;
+//                if (resetGame) {
+//                    for (int j = 0; j < gameBoard[current0].length; j++) {
+//                        current1 = j;
+//                        gameBoard[current0][current1].setVisibility(visInvis);
+//                    }
+//                }
+                    boolean itDraw = true;
+
+
+                    for (int[] coordinatesOfCurrentButton : currentShape) {
+                        current0 = coordinatesOfCurrentButton[0];
+                        current1 = coordinatesOfCurrentButton[1];
+                        if (coordinatesOfCurrentButton[0] != 19
+                                && (gameBoard[current0 + 1][current1].getVisibility() == View.INVISIBLE || checkCoordinates(current0 + 1, current1, currentShape))) {
+                            continue;
+                        } else {
+                            itDraw = false;
+                            incrementFillLines();
+                            checkFillLines();
+                            createShape();
+                            break;
+                        }
+
                     }
-//                    4 invis 0 vis 8 gone
-                }
-                if (itDraw) {
-                    setAttributeInvisible();
-                    for (int i = currentShape.length - 1; i >= 0; i--) {
-                        currentShape[i][0] = currentShape[i][0] + 1;
+                    if (itDraw) {
+                        setAttributeInvisible();
+                        for (int i = currentShape.length - 1; i >= 0; i--) {
+                            currentShape[i][0] = currentShape[i][0] + 1;
+                        }
+                        setAttributeVisible();
                     }
-                    setAttributeVisible();
-                }
 
             }
         }
@@ -247,11 +380,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int countOfCleanLines = 0;
         for (int i = fillingLines.length - 1; i >= 0; i--) {
             if (fillingLines[i] == 10) {
-
                 countOfCleanLines++;
-
-
-            } else if (countOfCleanLines > 0){
+                score += 10;
+                totalScore.setText("Score: " + score);
+            } else if (countOfCleanLines > 0) {
                 for (int j = 0; j < 10; j++) {
                     gameBoard[i + countOfCleanLines][j].setVisibility(gameBoard[i][j].getVisibility());
                     gameBoard[i][j].setVisibility(View.INVISIBLE);
@@ -284,7 +416,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void runThread() {
+        resetGame = false;
         game = new Game();
+
         game.execute();
 
     }
@@ -305,9 +439,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public int[][] choiceNewShape() {
 
-        currentShapeInt = ThreadLocalRandom.current().nextInt(0, 7);
+        currentShapeInt = nextShapeInt;
         return shapesArray[currentShapeInt];
     }
+
+
 
     public boolean checkIndexOutOfBounds() {
         boolean check = false;
@@ -364,13 +500,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             current0 = coordinatesOfCurrentButton[0] + movement0;
             current1 = coordinatesOfCurrentButton[1] + movement1;
 
-            if (gameBoard[current0][current1].getVisibility() == View.INVISIBLE ? true : checkCoordinates(current0, current1, MainActivity.currentShape)) {
+            if (gameBoard[current0][current1].getVisibility() == View.INVISIBLE || checkCoordinates(current0, current1, MainActivity.currentShape)) {
                 continue;
             } else {
                 itDraw = false;
                 break;
             }
-//                    4 invis 0 vis 8 gone
+
         }
         return itDraw;
     }
@@ -387,13 +523,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         current0 = coordinatesOfCurrentButton[0];
                         current1 = coordinatesOfCurrentButton[1];
                         if (coordinatesOfCurrentButton[1] != 0
-                                && (gameBoard[current0][current1 - 1].getVisibility() == View.INVISIBLE ? true : checkCoordinates(current0, current1 - 1, MainActivity.currentShape))) {
+                                && (gameBoard[current0][current1 - 1].getVisibility() == View.INVISIBLE || checkCoordinates(current0, current1 - 1, MainActivity.currentShape))) {
                             continue;
                         } else {
                             itDraw = false;
                             break;
                         }
-//                    4 invis 0 vis 8 gone
+
                     }
                     if (itDraw) {
                         setAttributeInvisible();
@@ -408,14 +544,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     for (int[] coordinatesOfCurrentButton : currentShape) {
                         current0 = coordinatesOfCurrentButton[0];
                         current1 = coordinatesOfCurrentButton[1];
-                        if (coordinatesOfCurrentButton[1] != 9
-                                && (gameBoard[current0][current1 + 1].getVisibility() == View.INVISIBLE ? true : checkCoordinates(current0, current1 + 1, MainActivity.currentShape))) {
-                            continue;
-                        } else {
+                        if (coordinatesOfCurrentButton[1] == 9
+                                || (gameBoard[current0][current1 + 1].getVisibility() != View.INVISIBLE && !checkCoordinates(current0, current1 + 1, MainActivity.currentShape))) {
                             itDraw = false;
                             break;
                         }
-//                    4 invis 0 vis 8 gone
+
                     }
                     if (itDraw) {
                         setAttributeInvisible();
@@ -699,6 +833,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     public void initializeButtonsOnGameBoard() {
+        btNextShape00 = findViewById(R.id.btNextShape00);
+        btNextShape01 = findViewById(R.id.btNextShape01);
+        btNextShape02 = findViewById(R.id.btNextShape02);
+        btNextShape03 = findViewById(R.id.btNextShape03);
+        btNextShape10 = findViewById(R.id.btNextShape10);
+        btNextShape11 = findViewById(R.id.btNextShape11);
+        btNextShape12 = findViewById(R.id.btNextShape12);
+        btNextShape13 = findViewById(R.id.btNextShape13);
+        btNextShape20 = findViewById(R.id.btNextShape20);
+        btNextShape21 = findViewById(R.id.btNextShape21);
+        btNextShape22 = findViewById(R.id.btNextShape22);
+        btNextShape23 = findViewById(R.id.btNextShape23);
+        btNextShape30 = findViewById(R.id.btNextShape30);
+        btNextShape31 = findViewById(R.id.btNextShape31);
+        btNextShape32 = findViewById(R.id.btNextShape32);
+        btNextShape33 = findViewById(R.id.btNextShape33);
+
         bt00 = findViewById(R.id.button00);
         bt01 = findViewById(R.id.button01);
         bt02 = findViewById(R.id.button02);
