@@ -196,7 +196,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     public void createShape() {
-
+        if (game != null && game.isCancelled()) {
+            resetGame();
+        }
         int[][] shape = choiceNewShape();
         countOfShapes++;
         nextShapeInt = ThreadLocalRandom.current().nextInt(0, 7);
@@ -209,7 +211,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             shapeForHandle[i][0] = shape[i][0];
             shapeForHandle[i][1] = shape[i][1];
 
-            gameBoard[shape[i][0]][shape[i][1]].setVisibility(View.VISIBLE);
+            if (gameBoard[shape[i][0]][shape[i][1]].getVisibility() != View.VISIBLE) {
+                gameBoard[shape[i][0]][shape[i][1]].setVisibility(View.VISIBLE);
+
+            } else {
+                game.cancel(false);
+            }
 
         }
 
